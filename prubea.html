@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación Interactiva: Principio I de SOLID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Soft Sage -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar for navigating between six key sections that mirror the source presentation. The core is an interactive dual-calculator demo in Section 5, allowing users to directly experience the "before" and "after" of applying ISP. This structure turns a static presentation into an engaging, hands-on learning tool, which is better for usability and understanding than a simple scrollable document. -->
+    <!-- Visualization & Content Choices: 1. SOLID Intro: Styled list for clarity. 2. Problem/Solution: Custom HTML/CSS diagrams instead of static images to visually represent "fat" vs. "segregated" interfaces. This is more dynamic and integrated. 3. Interactive Example: A two-tabbed form component built with JS to simulate the user's PHP scripts (`antes.php`, `despues.php`). This provides direct, interactive proof of the principle's benefits, which is the most effective way to teach a design concept. No charts are needed as the content is conceptual. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #333;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active {
+            border-left-color: #4A5568;
+            background-color: #E2E8F0;
+            color: #2D3748;
+            transform: translateX(5px);
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E2E8F0;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            border-bottom-color: #EF4444;
+            color: #EF4444;
+            font-weight: 600;
+        }
+        .tab-btn.active-good {
+            border-bottom-color: #22C55E;
+            color: #22C55E;
+            font-weight: 600;
+        }
+        .diagram-box {
+            border: 2px solid #9CA3AF;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .diagram-line {
+            height: 2px;
+            background-color: #9CA3AF;
+        }
+        .diagram-line-bad {
+            background-color: #EF4444;
+        }
+        .diagram-line-good {
+            background-color: #22C55E;
+        }
+        .code-block {
+            background-color: #1F2937; /* bg-gray-800 */
+            color: #D1D5DB; /* text-gray-300 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        /* PHP Syntax Highlighting Styles */
+        .code-block .php-comment { color: #6B7280; } /* text-gray-500 */
+        .code-block .php-keyword { color: #60A5FA; } /* text-blue-400 */
+        .code-block .php-variable { color: #4ADE80; } /* text-green-400 */
+        .code-block .php-string { color: #FBBF24; } /* text-amber-400 */
+        .code-block .php-function { color: #FACC15; } /* text-yellow-400 */
+        .code-block .php-class { color: #34D399; } /* text-emerald-400 */
+        .code-block .php-tag { color: #9CA3AF; font-weight: bold;} /* text-gray-400 */
+        .code-block .php-op { color: #F472B6; } /* text-pink-400 */
+
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="w-64 bg-white shadow-lg fixed top-0 left-0 h-full p-4 hidden lg:block">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 px-2">Navegación</h2>
+            <ul class="space-y-2" id="nav-list">
+                <li><a href="#intro" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Introducción a SOLID</a></li>
+                <li><a href="#what-is-isp" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">¿Qué es ISP?</a></li>
+                <li><a href="#problem" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">El Problema</a></li>
+                <li><a href="#solution" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">La Solución</a></li>
+                <li><a href="#example" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Ejemplo Interactivo</a></li>
+                <li><a href="#conclusion" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Conclusión</a></li>
+                <li><a href="#code-example" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Código de Ejemplo</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64 p-6 md:p-10">
+            <header class="mb-10 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800">📊 Principio de Segregación de Interfaces</h1>
+                <p class="text-lg text-gray-500 mt-2">Una exploración interactiva de la "I" en SOLID</p>
+            </header>
+
+            <!-- Section 1: Introduction to SOLID -->
+            <section id="intro" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Diapositiva 1: Introducción a SOLID</h2>
+                <p class="text-lg text-gray-600 mb-6">SOLID es un acrónimo de cinco principios de diseño de software que nos ayudan a crear sistemas más comprensibles, flexibles y mantenibles.</p>
+                <ul class="space-y-3">
+                    <li class="p-4 bg-gray-100 rounded-lg text-lg"><strong>S</strong> - Single Responsibility Principle (Principio de Responsabilidad Única)</li>
+                    <li class="p-4 bg-gray-100 rounded-lg text-lg"><strong>O</strong> - Open/Closed Principle (Principio de Abierto/Cerrado)</li>
+                    <li class="p-4 bg-gray-100 rounded-lg text-lg"><strong>L</strong> - Liskov Substitution Principle (Principio de Sustitución de Liskov)</li>
+                    <li class="p-4 bg-green-100 border-l-4 border-green-500 rounded-lg text-lg font-bold text-green-800"><strong>I</strong> - Interface Segregation Principle (Principio de Segregación de Interfaces)</li>
+                    <li class="p-4 bg-gray-100 rounded-lg text-lg"><strong>D</strong> - Dependency Inversion Principle (Principio de Inversión de Dependencias)</li>
+                </ul>
+            </section>
+
+            <!-- Section 2: What is ISP? -->
+            <section id="what-is-isp" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Diapositiva 2: ¿Qué es el Principio de Segregación de Interfaces (ISP)?</h2>
+                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-6 rounded-r-lg">
+                    <p class="text-2xl font-semibold">"Los clientes no deben ser forzados a depender de interfaces que no utilizan."</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mt-6 text-lg text-gray-700">
+                    <div class="bg-gray-50 p-4 rounded-lg">Es mejor tener <strong>muchas interfaces pequeñas y específicas</strong> (segregadas) que una única interfaz "gorda" y generalista.</div>
+                    <div class="bg-gray-50 p-4 rounded-lg">Cada interfaz debe tener un <strong>propósito claro y un conjunto mínimo de métodos</strong> relacionados con ese propósito.</div>
+                </div>
+            </section>
+            
+            <!-- Section 3: The Problem -->
+            <section id="problem" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Diapositiva 3: El Problema de las Interfaces "Gordas"</h2>
+                <p class="text-lg text-gray-600 mb-6">Cuando no se aplica el ISP, una clase pequeña puede verse "aplastada" por una interfaz enorme.</p>
+                <div class="flex flex-col items-center justify-center p-6 bg-red-50 rounded-lg border-2 border-dashed border-red-200">
+                    <div class="diagram-box w-full max-w-md bg-white">
+                        <h3 class="font-bold text-xl">Interfaz "Gorda"</h3>
+                        <p class="text-sm text-gray-500">CalculadoraCompleta</p>
+                    </div>
+                    <div class="w-full max-w-xs grid grid-cols-3 gap-x-4 my-4">
+                         <div class="diagram-line diagram-line-bad"></div>
+                         <div class="diagram-line diagram-line-bad"></div>
+                         <div class="diagram-line diagram-line-bad"></div>
+                    </div>
+                    <div class="diagram-box w-48 bg-white relative">
+                         <h3 class="font-bold text-lg">Clase Cliente</h3>
+                         <p class="text-sm text-gray-500">CalculadoraBasica</p>
+                         <span class="absolute -top-3 -right-3 text-3xl animate-bounce">🥵</span>
+                    </div>
+                    <p class="mt-4 text-red-600 font-semibold text-center">Esta clase se ve obligada a implementar métodos que no necesita, como `calcularLogaritmo()`.</p>
+                </div>
+            </section>
+
+            <!-- Section 4: The Solution -->
+            <section id="solution" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Diapositiva 4: La Solución - Interfaces Segregadas</h2>
+                <p class="text-lg text-gray-600 mb-6">La solución es simple: dividir la interfaz grande en interfaces más pequeñas y especializadas.</p>
+                 <div class="p-6 bg-green-50 rounded-lg border-2 border-dashed border-green-200">
+                    <div class="grid md:grid-cols-3 gap-4 mb-4 text-center">
+                         <div class="diagram-box bg-white"><h3 class="font-medium">Op. Básicas</h3></div>
+                         <div class="diagram-box bg-white"><h3 class="font-medium">Op. Avanzadas</h3></div>
+                         <div class="diagram-box bg-white"><h3 class="font-medium">Op. Científicas</h3></div>
+                    </div>
+                    <div class="flex justify-center my-4">
+                         <div class="w-2/3 grid grid-cols-3 gap-x-4">
+                            <div class="flex justify-center"><div class="h-8 w-0.5 bg-green-500"></div></div>
+                            <div class="flex justify-center"><div class="h-8 w-0.5 bg-gray-300"></div></div>
+                            <div class="flex justify-center"><div class="h-8 w-0.5 bg-gray-300"></div></div>
+                         </div>
+                    </div>
+                    <div class="flex justify-center">
+                         <div class="diagram-box w-48 bg-white relative">
+                             <h3 class="font-bold text-lg">Clase Cliente</h3>
+                             <p class="text-sm text-gray-500">CalculadoraBasica</p>
+                             <span class="absolute -top-3 -right-3 text-3xl">😊</span>
+                         </div>
+                    </div>
+                    <p class="mt-4 text-green-700 font-semibold text-center">Ahora la clase solo implementa la interfaz que necesita (Operaciones Básicas).</p>
+                </div>
+            </section>
+            
+            <!-- Section 5: Interactive Example -->
+            <section id="example" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Diapositiva 5: Ejemplo Interactivo</h2>
+                <div class="w-full">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-4" aria-label="Tabs">
+                            <button id="tab-btn-antes" class="tab-btn active py-4 px-1 border-b-2 font-medium text-lg">❌ Antes (Violando ISP)</button>
+                            <button id="tab-btn-despues" class="tab-btn py-4 px-1 border-b-2 font-medium text-lg">✅ Después (Aplicando ISP)</button>
+                        </nav>
+                    </div>
+                    
+                    <!-- Tab Content: ANTES -->
+                    <div id="tab-content-antes" class="pt-6">
+                        <p class="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">Esta calculadora básica está obligada por su interfaz "gorda" a listar todas las operaciones, aunque muchas fallarán.</p>
+                        <form id="form-antes" class="space-y-4">
+                            <div>
+                                <label for="num1-antes" class="block text-sm font-medium text-gray-700">Número 1</label>
+                                <input type="number" id="num1-antes" name="num1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="10" required>
+                            </div>
+                            <div>
+                                <label for="num2-antes" class="block text-sm font-medium text-gray-700">Número 2</label>
+                                <input type="number" id="num2-antes" name="num2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="5">
+                            </div>
+                            <div>
+                                <label for="op-antes" class="block text-sm font-medium text-gray-700">Operación</label>
+                                <select id="op-antes" name="operacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <optgroup label="✅ Operaciones Básicas (Funcionan)">
+                                        <option value="sumar">➕ Sumar</option>
+                                        <option value="restar">➖ Restar</option>
+                                        <option value="multiplicar">✖️ Multiplicar</option>
+                                        <option value="dividir">➗ Dividir</option>
+                                    </optgroup>
+                                    <optgroup label="❌ Operaciones Avanzadas (Fallan)">
+                                        <option value="potencia">🔢 Potencia</option>
+                                        <option value="raiz">√ Raíz cuadrada</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition">Calcular</button>
+                        </form>
+                        <div id="result-antes" class="mt-4 p-4 rounded-lg hidden"></div>
+                    </div>
+                    
+                    <!-- Tab Content: DESPUÉS -->
+                    <div id="tab-content-despues" class="pt-6 hidden">
+                         <p class="mb-4 p-4 bg-green-50 text-green-700 rounded-lg">Aquí, las operaciones disponibles cambian según el tipo de calculadora seleccionada, demostrando la flexibilidad de las interfaces segregadas.</p>
+                        <form id="form-despues" class="space-y-4">
+                            <div>
+                                <label for="calc-type-despues" class="block text-sm font-medium text-gray-700">Tipo de Calculadora</label>
+                                <select id="calc-type-despues" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                    <option value="basica">🔵 Calculadora Básica</option>
+                                    <option value="avanzada">🟣 Calculadora Avanzada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="num1-despues" class="block text-sm font-medium text-gray-700">Número 1</label>
+                                <input type="number" id="num1-despues" name="num1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="10" required>
+                            </div>
+                            <div>
+                                <label for="num2-despues" class="block text-sm font-medium text-gray-700">Número 2</label>
+                                <input type="number" id="num2-despues" name="num2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="5">
+                            </div>
+                            <div>
+                                <label for="op-despues" class="block text-sm font-medium text-gray-700">Operación</label>
+                                <select id="op-despues" name="operacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></select>
+                            </div>
+                            <button type="submit" class="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition">Calcular</button>
+                        </form>
+                        <div id="result-despues" class="mt-4 p-4 rounded-lg hidden"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Conclusion -->
+            <section id="conclusion" class="mb-16 card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Diapositiva 6: Conclusión</h2>
+                <p class="text-lg text-gray-600 mb-6">Aplicar el Principio de Segregación de Interfaces nos guía a diseñar interfaces más cohesivas y enfocadas, lo que resulta en un software mucho mejor.</p>
+                <div class="grid md:grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Código más Limpio</strong></div>
+                    <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Mayor Flexibilidad</strong></div>
+                    <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Facilidad de Mantenimiento</strong></div>
+                    <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Mejor Comprensión</strong></div>
+                </div>
+            </section>
+
+            <!-- Section 7: Code Example -->
+            <section id="code-example" class="card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Código de Ejemplo (PHP)</h2>
+                <p class="text-lg text-gray-600 mb-6">Aquí puedes ver el código fuente PHP real que demuestra la violación y la aplicación del Principio de Segregación de Interfaces.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- ANTES Code -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2 text-red-600">❌ Antes: Violando ISP</h3>
+                        <pre class="code-block"><code class="language-php"><span class="php-tag"><?php</span>
+<span class="php-comment">// ========================================</span>
+<span class="php-comment">// ANTES: Violando el principio I de SOLID</span>
+<span class="php-comment">// ========================================</span>
+
+<span class="php-comment">// Una interfaz "gorda" que obliga a implementar métodos</span>
+<span class="php-keyword">interface</span> <span class="php-class">CalculadoraCompleta</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-comment">// Esta clase se ve obligada a implementar métodos que no necesita</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraBasica</span> <span class="php-keyword">implements</span> <span class="php-class">CalculadoraCompleta</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> + <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> - <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> * <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">return</span> <span class="php-variable">$b</span> != 0 ? <span class="php-variable">$a</span> / <span class="php-variable">$b</span> : <span class="php-string">"Error"</span>;
+    }
+    
+    <span class="php-comment">// ¡Métodos que no necesitamos pero estamos OBLIGADOS a implementar!</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>) {
+        <span class="php-keyword">throw</span> <span class="php-keyword">new</span> <span class="php-class">Exception</span>(<span class="php-string">"No soportada"</span>);
+    }
+    
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">throw</span> <span class="php-keyword">new</span> <span class="php-class">Exception</span>(<span class="php-string">"No soportada"</span>);
+    }
+}
+<span class="php-tag">?></span>
+</code></pre>
+                    </div>
+
+                    <!-- DESPUÉS Code -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2 text-green-600">✅ Después: Aplicando ISP</h3>
+                        <pre class="code-block"><code class="language-php"><span class="php-tag"><?php</span>
+<span class="php-comment">// ========================================</span>
+<span class="php-comment">// DESPUÉS: Aplicando el principio I de SOLID</span>
+<span class="php-comment">// ========================================</span>
+
+<span class="php-comment">// Interfaces pequeñas y específicas</span>
+<span class="php-keyword">interface</span> <span class="php-class">OperacionesBasicas</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-keyword">interface</span> <span class="php-class">OperacionesAvanzadas</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-comment">// Calculadora básica: SOLO implementa lo que necesita</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraBasica</span> <span class="php-keyword">implements</span> <span class="php-class">OperacionesBasicas</span> {
+    <span class="php-comment">// ... implementaciones ...</span>
+}
+
+<span class="php-comment">// Calculadora avanzada: implementa básicas Y avanzadas</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraAvanzada</span> <span class="php-keyword">implements</span> <span class="php-class">OperacionesBasicas</span>, <span class="php-class">OperacionesAvanzadas</span> {
+    <span class="php-comment">// ... implementaciones de OperacionesBasicas</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> + <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> - <span class="php-variable">$b</span>; }
+
+    <span class="php-comment">// ... implementaciones de OperacionesAvanzadas</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>) {
+        <span class="php-keyword">return</span> <span class="php-variable">$a</span> >= 0 ? <span class="php-function">sqrt</span>(<span class="php-variable">$a</span>) : <span class="php-string">"Error"</span>;
+    }
+    
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">return</span> <span class="php-function">pow</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    }
+}
+<span class="php-tag">?></span></code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation scroll highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('#nav-list a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => observer.observe(section));
+
+            // Tabs for interactive example
+            const tabBtnAntes = document.getElementById('tab-btn-antes');
+            const tabBtnDespues = document.getElementById('tab-btn-despues');
+            const contentAntes = document.getElementById('tab-content-antes');
+            const contentDespues = document.getElementById('tab-content-despues');
+
+            tabBtnAntes.addEventListener('click', () => {
+                tabBtnAntes.classList.add('active');
+                tabBtnDespues.classList.remove('active-good');
+                contentAntes.classList.remove('hidden');
+                contentDespues.classList.add('hidden');
+            });
+
+            tabBtnDespues.addEventListener('click', () => {
+                tabBtnDespues.classList.add('active-good');
+                tabBtnAntes.classList.remove('active');
+                contentDespues.classList.remove('hidden');
+                contentAntes.classList.add('hidden');
+            });
+            
+            // --- LOGIC FOR "ANTES" CALCULATOR ---
+            const formAntes = document.getElementById('form-antes');
+            const resultAntesDiv = document.getElementById('result-antes');
+
+            formAntes.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const num1 = parseFloat(document.getElementById('num1-antes').value);
+                const num2 = parseFloat(document.getElementById('num2-antes').value);
+                const operation = document.getElementById('op-antes').value;
+                let result;
+                let error = false;
+
+                switch(operation) {
+                    case 'sumar': result = num1 + num2; break;
+                    case 'restar': result = num1 - num2; break;
+                    case 'multiplicar': result = num1 * num2; break;
+                    case 'dividir': 
+                        result = num2 !== 0 ? num1 / num2 : "Error: División por cero";
+                        if (typeof result === 'string') error = true;
+                        break;
+                    case 'potencia':
+                    case 'raiz':
+                        result = `Error: Operación no soportada en calculadora básica.`;
+                        error = true;
+                        break;
+                }
+                
+                resultAntesDiv.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                if (error) {
+                    resultAntesDiv.classList.add('bg-red-100', 'text-red-700');
+                    resultAntesDiv.innerHTML = `<strong>❌ ${result}</strong>`;
+                } else {
+                    resultAntesDiv.classList.add('bg-green-100', 'text-green-700');
+                    resultAntesDiv.innerHTML = `<strong>✅ Resultado: ${result}</strong>`;
+                }
+            });
+
+            // --- LOGIC FOR "DESPUÉS" CALCULATOR ---
+            const formDespues = document.getElementById('form-despues');
+            const calcTypeSelect = document.getElementById('calc-type-despues');
+            const opDespuesSelect = document.getElementById('op-despues');
+            const resultDespuesDiv = document.getElementById('result-despues');
+
+            const operations = {
+                basica: [
+                    { value: 'sumar', text: '➕ Sumar' },
+                    { value: 'restar', text: '➖ Restar' },
+                    { value: 'multiplicar', text: '✖️ Multiplicar' },
+                    { value: 'dividir', text: '➗ Dividir' },
+                ],
+                avanzada: [
+                    { value: 'potencia', text: '🔢 Potencia' },
+                    { value: 'raiz', text: '√ Raíz cuadrada' },
+                ]
+            };
+
+            function updateOperations() {
+                const calcType = calcTypeSelect.value;
+                opDespuesSelect.innerHTML = ''; // Clear existing options
+
+                let availableOps = [...operations.basica];
+                if (calcType === 'avanzada') {
+                    availableOps = [...availableOps, ...operations.avanzada];
+                }
+
+                availableOps.forEach(op => {
+                    const option = document.createElement('option');
+                    option.value = op.value;
+                    option.textContent = op.text;
+                    opDespuesSelect.appendChild(option);
+                });
+            }
+            
+            calcTypeSelect.addEventListener('change', updateOperations);
+            updateOperations(); // Initial population
+
+            formDespues.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const num1 = parseFloat(document.getElementById('num1-despues').value);
+                const num2 = parseFloat(document.getElementById('num2-despues').value);
+                const operation = document.getElementById('op-despues').value;
+                let result;
+                let error = false;
+
+                switch(operation) {
+                    case 'sumar': result = num1 + num2; break;
+                    case 'restar': result = num1 - num2; break;
+                    case 'multiplicar': result = num1 * num2; break;
+                    case 'dividir':
+                        result = num2 !== 0 ? num1 / num2 : "Error: División por cero";
+                        if (typeof result === 'string') error = true;
+                        break;
+                    case 'potencia': result = Math.pow(num1, num2); break;
+                    case 'raiz': 
+                        result = num1 >= 0 ? Math.sqrt(num1) : "Error: Número negativo";
+                        if (typeof result === 'string') error = true;
+                        break;
+                }
+
+                resultDespuesDiv.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                if (error) {
+                    resultDespuesDiv.classList.add('bg-red-100', 'text-red-700');
+                    resultDespuesDiv.innerHTML = `<strong>❌ ${result}</strong>`;
+                } else {
+                    resultDespuesDiv.classList.add('bg-green-100', 'text-green-700');
+                    resultDespuesDiv.innerHTML = `<strong>✅ Resultado: ${result}</strong>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
