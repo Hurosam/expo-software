@@ -61,6 +61,27 @@
         .diagram-line-good {
             background-color: #22C55E;
         }
+        .code-block {
+            background-color: #1F2937; /* bg-gray-800 */
+            color: #D1D5DB; /* text-gray-300 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        /* PHP Syntax Highlighting Styles */
+        .code-block .php-comment { color: #6B7280; } /* text-gray-500 */
+        .code-block .php-keyword { color: #60A5FA; } /* text-blue-400 */
+        .code-block .php-variable { color: #4ADE80; } /* text-green-400 */
+        .code-block .php-string { color: #FBBF24; } /* text-amber-400 */
+        .code-block .php-function { color: #FACC15; } /* text-yellow-400 */
+        .code-block .php-class { color: #34D399; } /* text-emerald-400 */
+        .code-block .php-tag { color: #9CA3AF; font-weight: bold;} /* text-gray-400 */
+        .code-block .php-op { color: #F472B6; } /* text-pink-400 */
+
     </style>
 </head>
 <body class="bg-gray-50">
@@ -76,6 +97,7 @@
                 <li><a href="#solution" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">La Solución</a></li>
                 <li><a href="#example" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Ejemplo Interactivo</a></li>
                 <li><a href="#conclusion" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Conclusión</a></li>
+                <li><a href="#code-example" class="nav-link block font-medium text-gray-600 hover:bg-gray-100 p-3 rounded-lg">Código de Ejemplo</a></li>
             </ul>
         </nav>
 
@@ -236,7 +258,7 @@
             </section>
 
             <!-- Section 6: Conclusion -->
-            <section id="conclusion" class="card p-8">
+            <section id="conclusion" class="mb-16 card p-8">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">Diapositiva 6: Conclusión</h2>
                 <p class="text-lg text-gray-600 mb-6">Aplicar el Principio de Segregación de Interfaces nos guía a diseñar interfaces más cohesivas y enfocadas, lo que resulta en un software mucho mejor.</p>
                 <div class="grid md:grid-cols-2 gap-4 text-center">
@@ -244,6 +266,97 @@
                     <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Mayor Flexibilidad</strong></div>
                     <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Facilidad de Mantenimiento</strong></div>
                     <div class="p-4 bg-green-100 rounded-lg">✅ <strong>Mejor Comprensión</strong></div>
+                </div>
+            </section>
+
+            <!-- Section 7: Code Example -->
+            <section id="code-example" class="card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Código de Ejemplo (PHP)</h2>
+                <p class="text-lg text-gray-600 mb-6">Aquí puedes ver el código fuente PHP real que demuestra la violación y la aplicación del Principio de Segregación de Interfaces.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- ANTES Code -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2 text-red-600">❌ Antes: Violando ISP</h3>
+                        <pre class="code-block"><code class="language-php"><span class="php-tag"><?php</span>
+<span class="php-comment">// ========================================</span>
+<span class="php-comment">// ANTES: Violando el principio I de SOLID</span>
+<span class="php-comment">// ========================================</span>
+
+<span class="php-comment">// Una interfaz "gorda" que obliga a implementar métodos</span>
+<span class="php-keyword">interface</span> <span class="php-class">CalculadoraCompleta</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-comment">// Esta clase se ve obligada a implementar métodos que no necesita</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraBasica</span> <span class="php-keyword">implements</span> <span class="php-class">CalculadoraCompleta</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> + <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> - <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> * <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">return</span> <span class="php-variable">$b</span> != 0 ? <span class="php-variable">$a</span> / <span class="php-variable">$b</span> : <span class="php-string">"Error"</span>;
+    }
+    
+    <span class="php-comment">// ¡Métodos que no necesitamos pero estamos OBLIGADOS a implementar!</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>) {
+        <span class="php-keyword">throw</span> <span class="php-keyword">new</span> <span class="php-class">Exception</span>(<span class="php-string">"No soportada"</span>);
+    }
+    
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">throw</span> <span class="php-keyword">new</span> <span class="php-class">Exception</span>(<span class="php-string">"No soportada"</span>);
+    }
+}
+<span class="php-tag">?></span>
+</code></pre>
+                    </div>
+
+                    <!-- DESPUÉS Code -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2 text-green-600">✅ Después: Aplicando ISP</h3>
+                        <pre class="code-block"><code class="language-php"><span class="php-tag"><?php</span>
+<span class="php-comment">// ========================================</span>
+<span class="php-comment">// DESPUÉS: Aplicando el principio I de SOLID</span>
+<span class="php-comment">// ========================================</span>
+
+<span class="php-comment">// Interfaces pequeñas y específicas</span>
+<span class="php-keyword">interface</span> <span class="php-class">OperacionesBasicas</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">multiplicar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">dividir</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-keyword">interface</span> <span class="php-class">OperacionesAvanzadas</span> {
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>);
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+}
+
+<span class="php-comment">// Calculadora básica: SOLO implementa lo que necesita</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraBasica</span> <span class="php-keyword">implements</span> <span class="php-class">OperacionesBasicas</span> {
+    <span class="php-comment">// ... implementaciones ...</span>
+}
+
+<span class="php-comment">// Calculadora avanzada: implementa básicas Y avanzadas</span>
+<span class="php-keyword">class</span> <span class="php-class">CalculadoraAvanzada</span> <span class="php-keyword">implements</span> <span class="php-class">OperacionesBasicas</span>, <span class="php-class">OperacionesAvanzadas</span> {
+    <span class="php-comment">// ... implementaciones de OperacionesBasicas</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">sumar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> + <span class="php-variable">$b</span>; }
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">restar</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) { <span class="php-keyword">return</span> <span class="php-variable">$a</span> - <span class="php-variable">$b</span>; }
+
+    <span class="php-comment">// ... implementaciones de OperacionesAvanzadas</span>
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularRaizCuadrada</span>(<span class="php-variable">$a</span>) {
+        <span class="php-keyword">return</span> <span class="php-variable">$a</span> >= 0 ? <span class="php-function">sqrt</span>(<span class="php-variable">$a</span>) : <span class="php-string">"Error"</span>;
+    }
+    
+    <span class="php-keyword">public</span> <span class="php-keyword">function</span> <span class="php-function">calcularPotencia</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>) {
+        <span class="php-keyword">return</span> <span class="php-function">pow</span>(<span class="php-variable">$a</span>, <span class="php-variable">$b</span>);
+    }
+}
+<span class="php-tag">?></span></code></pre>
+                    </div>
                 </div>
             </section>
         </main>
